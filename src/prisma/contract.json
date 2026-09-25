@@ -496,6 +496,13 @@
                   "kind": "scalar"
                 }
               },
+              "password": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "updatedAt": {
                 "nullable": false,
                 "type": {
@@ -541,6 +548,9 @@
                 },
                 "name": {
                   "column": "name"
+                },
+                "password": {
+                  "column": "password"
                 },
                 "updatedAt": {
                   "column": "updatedAt"
@@ -941,6 +951,11 @@
                   "nativeType": "text",
                   "nullable": true
                 },
+                "password": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
                 "updatedAt": {
                   "codecId": "pg/timestamptz-string@1",
                   "nativeType": "timestamptz",
@@ -973,7 +988,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "7d595fbc1a567fc2c219ac5e4ded4163d1370d3cebfec6a03d0df197ba1d95d4"
+    "storageHash": "6d857cb539072ce28b74a968462e3f7540f918aabfc7602d30a4f582ade060c6"
   },
   "execution": {
     "executionHash": "db9395230d4b96ffc98428a24b287c6aff5a11cad0406501698e544026ae369d",

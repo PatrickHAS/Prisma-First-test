@@ -1,0 +1,92 @@
+[
+  {
+    "id": "column.public.user.password",
+    "label": "Add column \"password\" to \"user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "password",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"password\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "user",
+          "password"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"password\"",
+        "sql": "ALTER TABLE \"public\".\"user\" ADD COLUMN \"password\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"password\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "user",
+          "password"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "alterNullability.setNotNull.user.password",
+    "label": "Set NOT NULL on \"user\".\"password\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "password",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"password\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "user",
+          "password"
+        ]
+      },
+      {
+        "description": "ensure no NULL values in \"password\"",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"public\".\"user\" WHERE \"password\" IS NULL) AS \"result\"",
+        "params": []
+      }
+    ],
+    "execute": [
+      {
+        "description": "set NOT NULL on \"password\"",
+        "sql": "ALTER TABLE \"public\".\"user\" ALTER COLUMN \"password\" SET NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"password\" is NOT NULL",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "user",
+          "password",
+          "NO"
+        ]
+      }
+    ]
+  }
+]
