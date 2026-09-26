@@ -1,18 +1,22 @@
 import bcrypt from "bcrypt";
 import { UserRepository } from "../repositories/UserRepository";
+import { TokenService } from "./TokenService";
+import { AppError } from "../errors/AppError";
 
 export class AuthService {
   private userRepository: UserRepository;
+  private tokenService: TokenService;
 
   constructor() {
     this.userRepository = new UserRepository();
+    this.tokenService = new TokenService();
   }
 
   async register(data: { email: string; password: string; name?: string }) {
     const existingUser = await this.userRepository.findByEmail(data.email);
 
     if (existingUser) {
-      throw new Error("Email já cadastrado");
+      throw new AppError("Email já cadastrado", 400);
     }
 
     const passwordHash = await bcrypt.hash(data.password, 10);
@@ -34,19 +38,19 @@ export class AuthService {
     const user = await this.userRepository.findByEmail(data.email);
 
     if (!user) {
-      throw new Error("Email ou senha inválidos");
+      throw new AppError("Email ou senha inválidos", 401);
     }
 
     const passwordIsValid = await bcrypt.compare(data.password, user.password);
 
     if (!passwordIsValid) {
-      throw new Error("Email ou senha inválidos");
+      throw new AppError("Email ou senha inválidos", 401);
     }
 
+    const accessToken = await this.tokenService.generateToken(user.id);
+
     return {
-      id: user.id,
-      email: user.email,
-      name: user.name,
+      accessToken,
     };
   }
 }

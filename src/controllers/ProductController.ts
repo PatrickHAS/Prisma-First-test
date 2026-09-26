@@ -9,7 +9,21 @@ export class ProductController {
   }
 
   async findAll(req: Request, res: Response) {
-    const products = await this.productService.findAll();
+    const page = Number(req.query.page ?? 1);
+    const limit = Number(req.query.limit ?? 10);
+
+    const minPrice =
+      req.query.minPrice !== undefined ? Number(req.query.minPrice) : undefined;
+
+    const maxPrice =
+      req.query.maxPrice !== undefined ? Number(req.query.maxPrice) : undefined;
+
+    const filters = {
+      ...(minPrice !== undefined && { minPrice }),
+      ...(maxPrice !== undefined && { maxPrice }),
+    };
+
+    const products = await this.productService.findAll(page, limit, filters);
 
     return res.status(200).json(products);
   }

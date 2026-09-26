@@ -1,8 +1,40 @@
 import { db } from "../prisma/db";
 
 export class ProductRepository {
-  async findAll() {
-    return db.orm.public.Product.all();
+  async findAll(
+    page: number,
+    limit: number,
+    filters?: {
+      minPrice?: number;
+      maxPrice?: number;
+    },
+  ) {
+    const offset = (page - 1) * limit;
+
+    let query = db.orm.public.Product;
+
+    if (filters?.minPrice !== undefined) {
+      query = query.where((product) => product.price.gte(filters.minPrice!));
+    }
+
+    if (filters?.maxPrice !== undefined) {
+      query = query.where((product) => product.price.lte(filters.maxPrice!));
+    }
+
+    const products = await query
+      .orderBy((product) => product.id.asc())
+      .offset(offset)
+      .limit(limit)
+      .all();
+
+    const result = await query.aggregate((agg) => ({
+      total: agg.count(),
+    }));
+
+    return {
+      products,
+      total: result.total,
+    };
   }
 
   async findById(id: number) {
@@ -42,5 +74,9 @@ export class ProductRepository {
 
   async delete(id: number) {
     return db.orm.public.Product.where({ id }).delete();
+  }
+
+  async updateStock(id: number, stock: number) {
+    return db.orm.public.Product.where({ id }).update({ stock });
   }
 }
