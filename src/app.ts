@@ -1,10 +1,10 @@
 import express from "express";
 import cors from "cors";
-import { Router } from "express";
 import productRoutes from "./routes/ProductsRoutes";
 import authRoutes from "./routes/AuthRoutes";
 import { errorMiddleware } from "./middlewares/ErrorMiddleware";
 import orderRoutes from "./routes/OrderRoutes";
+import categoryRoutes from "./routes/CategoryRoutes";
 
 const app = express();
 
@@ -15,11 +15,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/users", Router());
-
 app.use(productRoutes);
 app.use(authRoutes);
 app.use(orderRoutes);
+app.use("/categories", categoryRoutes);
 
 app.use(errorMiddleware);
 
