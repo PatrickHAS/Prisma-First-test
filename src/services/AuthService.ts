@@ -47,7 +47,10 @@ export class AuthService {
       throw new AppError("Email ou senha inválidos", 401);
     }
 
-    const accessToken = await this.tokenService.generateToken(user.id);
+    const accessToken = await this.tokenService.generateToken(
+      user.id,
+      user.role,
+    );
 
     return {
       accessToken,

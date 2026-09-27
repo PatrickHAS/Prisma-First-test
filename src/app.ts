@@ -3,7 +3,7 @@ import cors from "cors";
 import { Router } from "express";
 import productRoutes from "./routes/ProductsRoutes";
 import authRoutes from "./routes/AuthRoutes";
-import { errorMiddleware } from "./middlewares/error.middleware";
+import { errorMiddleware } from "./middlewares/ErrorMiddleware";
 import orderRoutes from "./routes/OrderRoutes";
 
 const app = express();

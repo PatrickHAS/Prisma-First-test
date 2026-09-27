@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { AuthService } from "../services/AuthService";
+import { AppError } from "../errors/AppError";
 
 export class AuthController {
   private authService: AuthService;
@@ -14,6 +15,12 @@ export class AuthController {
 
       return res.status(201).json(user);
     } catch (error) {
+      if (error instanceof AppError) {
+        return res.status(error.statusCode).json({
+          message: error.message,
+        });
+      }
+
       if (error instanceof Error) {
         return res.status(400).json({
           message: error.message,
@@ -32,6 +39,12 @@ export class AuthController {
 
       return res.status(200).json(user);
     } catch (error) {
+      if (error instanceof AppError) {
+        return res.status(error.statusCode).json({
+          message: error.message,
+        });
+      }
+
       if (error instanceof Error) {
         return res.status(401).json({
           message: error.message,

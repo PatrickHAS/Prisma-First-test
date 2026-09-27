@@ -1,3 +1,4 @@
+import { db } from "../prisma/db";
 import { AppError } from "../errors/AppError";
 import { OrderRepository } from "../repositories/OrderRepository";
 import { ProductRepository } from "../repositories/ProductRepository";
@@ -11,20 +12,6 @@ export class OrderService {
     this.productRepository = new ProductRepository();
   }
 
-  async findOrdersByUser(userId: number) {
-    return this.orderRepository.findByUserId(userId);
-  }
-
-  async findOrderById(id: number, userId: number) {
-    const order = await this.orderRepository.findByIdAndUserId(id, userId);
-
-    if (!order) {
-      throw new AppError("Pedido não encontrado", 404);
-    }
-
-    return order;
-  }
-
   async createOrder(
     userId: number,
     items: {
@@ -34,6 +21,17 @@ export class OrderService {
   ) {
     if (items.length === 0) {
       throw new AppError("O pedido deve possuir pelo menos um item", 400);
+    }
+
+    const productIds = items.map((item) => item.productId);
+
+    const uniqueProductIds = new Set(productIds);
+
+    if (uniqueProductIds.size !== productIds.length) {
+      throw new AppError(
+        "O mesmo produto não pode ser adicionado mais de uma vez ao pedido",
+        400,
+      );
     }
 
     let total = 0;
@@ -73,27 +71,38 @@ export class OrderService {
       });
     }
 
-    const order = await this.orderRepository.create({
-      userId,
-      total,
-      status: "PENDING",
-    });
-
-    for (const item of orderItems) {
-      await this.orderRepository.createItem({
-        orderId: order.id,
-        productId: item.productId,
-        quantity: item.quantity,
-        unitPrice: item.unitPrice,
-      });
-    }
-
-    for (const item of orderItems) {
-      await this.productRepository.updateStock(
-        item.productId,
-        item.stock - item.quantity,
+    const order = await db.transaction(async (tx) => {
+      const createdOrder = await this.orderRepository.create(
+        {
+          userId,
+          total,
+          status: "PENDING",
+        },
+        tx,
       );
-    }
+
+      for (const item of orderItems) {
+        await this.orderRepository.createItem(
+          {
+            orderId: createdOrder.id,
+            productId: item.productId,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+          },
+          tx,
+        );
+      }
+
+      for (const item of orderItems) {
+        await this.productRepository.updateStock(
+          item.productId,
+          item.stock - item.quantity,
+          tx,
+        );
+      }
+
+      return createdOrder;
+    });
 
     return {
       id: order.id,
@@ -101,5 +110,19 @@ export class OrderService {
       total: order.total,
       status: order.status,
     };
+  }
+
+  async findOrdersByUser(userId: number) {
+    return this.orderRepository.findByUserId(userId);
+  }
+
+  async findOrderById(id: number, userId: number) {
+    const order = await this.orderRepository.findByIdAndUserId(id, userId);
+
+    if (!order) {
+      throw new AppError("Pedido não encontrado", 404);
+    }
+
+    return order;
   }
 }

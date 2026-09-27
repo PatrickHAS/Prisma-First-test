@@ -20,17 +20,26 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@babel/core": "^8.0.6",
+    "@babel/preset-env": "^8.0.6",
+    "@babel/preset-typescript": "^8.0.1",
     "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
+    "@types/mocha": "^10.0.10",
     "@types/supertest": "^7.2.1",
+    "babel-jest": "^30.5.2",
     "jest": "^30.5.2",
+    "strip-ansi": "6.0.0",
     "supertest": "^7.3.0",
-    "ts-jest": "^29.4.13"
+    "ts-jest": "^29.4.13",
+    "tsx": "^4.23.15"
   },
   "scripts": {
     "postinstall": "prisma skills sync || exit 0",
-    "contract:emit": "prisma contract emit"
+    "contract:emit": "prisma contract emit",
+    "dev": "tsx watch src/server.ts",
+    "test": "jest"
   }
 }

@@ -10,9 +10,10 @@ if (!JWT_SECRET) {
 const secret = new TextEncoder().encode(JWT_SECRET);
 
 export class TokenService {
-  async generateToken(userId: number) {
+  async generateToken(userId: number, role: string) {
     return new SignJWT({
       userId,
+      role,
     })
       .setProtectedHeader({
         alg: "HS256",

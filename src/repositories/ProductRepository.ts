@@ -1,4 +1,5 @@
 import { db } from "../prisma/db";
+import type { TransactionContext } from "../prisma/transaction";
 
 export class ProductRepository {
   async findAll(
@@ -76,7 +77,9 @@ export class ProductRepository {
     return db.orm.public.Product.where({ id }).delete();
   }
 
-  async updateStock(id: number, stock: number) {
-    return db.orm.public.Product.where({ id }).update({ stock });
+  async updateStock(id: number, stock: number, tx?: TransactionContext) {
+    const orm = tx?.orm ?? db.orm;
+
+    return orm.public.Product.where({ id }).update({ stock });
   }
 }

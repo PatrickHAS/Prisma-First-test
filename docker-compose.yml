@@ -15,5 +15,20 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  api:
+    build: .
+    container_name: luxury_store_api
+    restart: unless-stopped
+
+    ports:
+      - "3000:3000"
+
+    environment:
+      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/luxury_store?schema=public"
+      JWT_SECRET: ${JWT_SECRET}
+
+    depends_on:
+      - postgres
+
 volumes:
   postgres_data:

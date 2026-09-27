@@ -15,3 +15,5 @@ export const createProductSchema = z.object({
 
   categoryId: z.number().int().positive(),
 });
+
+export const updateProductSchema = createProductSchema.partial();

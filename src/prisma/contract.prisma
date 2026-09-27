@@ -6,6 +6,7 @@ model User {
   password  String
   username  String?
   name      String?
+  role      String   @default("USER")
 
   orders    Order[]
 
