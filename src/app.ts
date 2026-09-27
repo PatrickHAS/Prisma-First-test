@@ -8,6 +8,8 @@ import orderRoutes from "./routes/OrderRoutes";
 
 const app = express();
 
+app.disable("etag");
+
 app.use(cors());
 
 app.use(express.json());
