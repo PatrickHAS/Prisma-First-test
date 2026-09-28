@@ -253,3 +253,127 @@ it("deve retornar um pedido pelo id", async () => {
 
   expect(mockFindByIdAndUserId).toHaveBeenCalledWith(100, 1);
 });
+
+it("deve rejeitar pedido quando o produto está inativo", async () => {
+  mockFindById.mockResolvedValue({
+    id: 1,
+    name: "Anel de Ouro",
+    price: 150000,
+    stock: 10,
+    active: false,
+  });
+
+  const service = new OrderService();
+
+  await expect(
+    service.createOrder(1, [
+      {
+        productId: 1,
+        quantity: 1,
+      },
+    ]),
+  ).rejects.toThrow("Produto não está disponível para venda");
+
+  expect(mockFindById).toHaveBeenCalledWith(1);
+  expect(mockCreate).not.toHaveBeenCalled();
+  expect(mockCreateItem).not.toHaveBeenCalled();
+  expect(mockUpdateStock).not.toHaveBeenCalled();
+});
+
+it("deve criar um pedido com múltiplos produtos", async () => {
+  mockFindById
+    .mockResolvedValueOnce({
+      id: 1,
+      name: "Anel de Ouro",
+      price: 150000,
+      stock: 10,
+      active: true,
+    })
+    .mockResolvedValueOnce({
+      id: 2,
+      name: "Colar de Prata",
+      price: 80000,
+      stock: 5,
+      active: true,
+    });
+
+  mockCreate.mockResolvedValue({
+    id: 101,
+    userId: 1,
+    total: 380000,
+    status: "PENDING",
+  });
+
+  mockCreateItem
+    .mockResolvedValueOnce({
+      id: 1,
+      orderId: 101,
+      productId: 1,
+      quantity: 2,
+      unitPrice: 150000,
+    })
+    .mockResolvedValueOnce({
+      id: 2,
+      orderId: 101,
+      productId: 2,
+      quantity: 1,
+      unitPrice: 80000,
+    });
+
+  const service = new OrderService();
+
+  const result = await service.createOrder(1, [
+    {
+      productId: 1,
+      quantity: 2,
+    },
+    {
+      productId: 2,
+      quantity: 1,
+    },
+  ]);
+
+  expect(result).toEqual({
+    id: 101,
+    userId: 1,
+    total: 380000,
+    status: "PENDING",
+  });
+
+  expect(mockCreate).toHaveBeenCalledWith(
+    {
+      userId: 1,
+      total: 380000,
+      status: "PENDING",
+    },
+    expect.anything(),
+  );
+
+  expect(mockCreateItem).toHaveBeenCalledTimes(2);
+
+  expect(mockCreateItem).toHaveBeenNthCalledWith(
+    1,
+    {
+      orderId: 101,
+      productId: 1,
+      quantity: 2,
+      unitPrice: 150000,
+    },
+    expect.anything(),
+  );
+
+  expect(mockCreateItem).toHaveBeenNthCalledWith(
+    2,
+    {
+      orderId: 101,
+      productId: 2,
+      quantity: 1,
+      unitPrice: 80000,
+    },
+    expect.anything(),
+  );
+
+  expect(mockUpdateStock).toHaveBeenCalledWith(1, 8, expect.anything());
+
+  expect(mockUpdateStock).toHaveBeenCalledWith(2, 4, expect.anything());
+});

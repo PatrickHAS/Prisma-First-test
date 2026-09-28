@@ -12,7 +12,9 @@ export class ProductRepository {
   ) {
     const offset = (page - 1) * limit;
 
-    let query = db.orm.public.Product;
+    let query = db.orm.public.Product.where({
+      active: true,
+    });
 
     if (filters?.minPrice !== undefined) {
       query = query.where((product) => product.price.gte(filters.minPrice!));
@@ -74,7 +76,9 @@ export class ProductRepository {
   }
 
   async delete(id: number) {
-    return db.orm.public.Product.where({ id }).delete();
+    return db.orm.public.Product.where({ id }).update({
+      active: false,
+    });
   }
 
   async updateStock(id: number, stock: number, tx?: TransactionContext) {

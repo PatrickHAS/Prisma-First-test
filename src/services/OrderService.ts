@@ -49,6 +49,9 @@ export class OrderService {
       if (!product) {
         throw new AppError(`Produto ${item.productId} não encontrado`, 404);
       }
+      if (product.active === false) {
+        throw new AppError("Produto não está disponível para venda", 400);
+      }
 
       if (item.quantity <= 0) {
         throw new AppError("A quantidade deve ser maior que zero", 400);
