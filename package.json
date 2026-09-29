@@ -40,6 +40,7 @@
     "postinstall": "prisma skills sync || exit 0",
     "contract:emit": "prisma contract emit",
     "dev": "tsx watch src/server.ts",
-    "test": "jest"
+    "test": "jest",
+    "admin:create": "tsx src/scripts/createAdmin.ts"
   }
 }

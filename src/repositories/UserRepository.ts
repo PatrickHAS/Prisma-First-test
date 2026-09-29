@@ -10,6 +10,7 @@ export class UserRepository {
     password: string;
     name?: string;
     username?: string;
+    role?: string;
   }) {
     return db.orm.public.User.create(data);
   }
