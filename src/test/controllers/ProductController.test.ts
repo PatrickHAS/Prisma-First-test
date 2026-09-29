@@ -507,3 +507,69 @@ it("deve retornar 500 quando ocorrer um erro interno ao atualizar o produto", as
     message: "Erro interno do servidor",
   });
 });
+
+it("deve listar produtos usando apenas preço mínimo", async () => {
+  mockFindAll.mockResolvedValue({
+    data: [],
+    pagination: {
+      page: 1,
+      limit: 10,
+      total: 0,
+      totalPages: 0,
+    },
+  });
+
+  const req = {
+    query: {
+      minPrice: "100000",
+    },
+  } as any;
+
+  const res = {
+    status: jest.fn().mockReturnThis(),
+    json: jest.fn().mockReturnThis(),
+  } as any;
+
+  const controller = new ProductController();
+
+  await controller.findAll(req, res);
+
+  expect(mockFindAll).toHaveBeenCalledWith(1, 10, {
+    minPrice: 100000,
+  });
+
+  expect(res.status).toHaveBeenCalledWith(200);
+});
+
+it("deve listar produtos usando apenas preço máximo", async () => {
+  mockFindAll.mockResolvedValue({
+    data: [],
+    pagination: {
+      page: 1,
+      limit: 10,
+      total: 0,
+      totalPages: 0,
+    },
+  });
+
+  const req = {
+    query: {
+      maxPrice: "200000",
+    },
+  } as any;
+
+  const res = {
+    status: jest.fn().mockReturnThis(),
+    json: jest.fn().mockReturnThis(),
+  } as any;
+
+  const controller = new ProductController();
+
+  await controller.findAll(req, res);
+
+  expect(mockFindAll).toHaveBeenCalledWith(1, 10, {
+    maxPrice: 200000,
+  });
+
+  expect(res.status).toHaveBeenCalledWith(200);
+});
