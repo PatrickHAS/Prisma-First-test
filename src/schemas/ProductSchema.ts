@@ -13,6 +13,8 @@ export const createProductSchema = z.object({
 
   active: z.boolean().optional(),
 
+  imageUrl: z.string().url("URL da imagem inválida").optional(),
+
   categoryId: z.number().int().positive(),
 });
 

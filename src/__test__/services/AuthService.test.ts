@@ -162,6 +162,12 @@ it("deve realizar login com sucesso", async () => {
 
   expect(result).toEqual({
     accessToken: "jwt-token-teste",
+    user: {
+      id: 1,
+      email: "cliente@luxury.com",
+      name: undefined,
+      role: "USER",
+    },
   });
 
   expect(mockFindByEmail).toHaveBeenCalledWith("cliente@luxury.com");

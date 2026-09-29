@@ -73,4 +73,10 @@ export class OrderRepository {
   ) {
     return tx.orm.public.OrderItem.create(data);
   }
+
+  async updateStatus(id: number, status: string, tx?: TransactionContext) {
+    const orm = tx?.orm ?? db.orm;
+
+    return orm.public.Order.where({ id }).update({ status });
+  }
 }

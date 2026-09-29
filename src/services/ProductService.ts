@@ -75,6 +75,7 @@ export class ProductService {
     stock: number;
     sku: string;
     active?: boolean;
+    imageUrl?: string;
     categoryId: number;
   }) {
     if (!data.name || data.name.trim() === "") {
@@ -111,6 +112,7 @@ export class ProductService {
       stock?: number;
       sku?: string;
       active?: boolean;
+      imageUrl?: string;
       categoryId?: number;
     },
   ) {

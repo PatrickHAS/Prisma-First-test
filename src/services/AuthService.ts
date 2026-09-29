@@ -54,6 +54,12 @@ export class AuthService {
 
     return {
       accessToken,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
     };
   }
 }

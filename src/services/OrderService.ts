@@ -128,4 +128,43 @@ export class OrderService {
 
     return order;
   }
+
+  async cancelOrder(id: number, userId: number) {
+    const order = await this.orderRepository.findByIdAndUserId(id, userId);
+
+    if (!order) {
+      throw new AppError("Pedido não encontrado", 404);
+    }
+
+    if (order.status === "CANCELLED") {
+      throw new AppError("Pedido já está cancelado", 400);
+    }
+
+    await db.transaction(async (tx) => {
+      await this.orderRepository.updateStatus(order.id, "CANCELLED", tx);
+
+      for (const item of order.items) {
+        const product = await this.productRepository.findById(
+          item.productId,
+          tx,
+        );
+
+        if (!product) {
+          throw new AppError(`Produto ${item.productId} não encontrado`, 404);
+        }
+
+        await this.productRepository.updateStock(
+          item.productId,
+          product.stock + item.quantity,
+          tx,
+        );
+      }
+    });
+
+    return {
+      id: order.id,
+      status: "CANCELLED",
+      total: order.total,
+    };
+  }
 }

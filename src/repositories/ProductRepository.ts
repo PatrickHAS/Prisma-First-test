@@ -40,8 +40,10 @@ export class ProductRepository {
     };
   }
 
-  async findById(id: number) {
-    return db.orm.public.Product.first({ id });
+  async findById(id: number, tx?: TransactionContext) {
+    const orm = tx?.orm ?? db.orm;
+
+    return orm.public.Product.first({ id });
   }
 
   async findBySku(sku: string) {
@@ -55,6 +57,7 @@ export class ProductRepository {
     stock: number;
     sku: string;
     active?: boolean;
+    imageUrl?: string;
     categoryId: number;
   }) {
     return db.orm.public.Product.create(data);
@@ -69,6 +72,7 @@ export class ProductRepository {
       stock?: number;
       sku?: string;
       active?: boolean;
+      imageUrl?: string;
       categoryId?: number;
     },
   ) {

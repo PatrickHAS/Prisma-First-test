@@ -37,4 +37,13 @@ export class OrderController {
 
     return res.status(200).json(order);
   }
+
+  async cancel(req: Request, res: Response) {
+    const userId = req.userId!;
+    const id = Number(req.params.id);
+
+    const order = await this.orderService.cancelOrder(id, userId);
+
+    return res.status(200).json(order);
+  }
 }

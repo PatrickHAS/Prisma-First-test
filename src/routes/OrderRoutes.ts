@@ -30,4 +30,11 @@ orderRoutes.get(
   asyncHandler((req, res) => orderController.findById(req, res)),
 );
 
+orderRoutes.patch(
+  "/orders/:id/cancel",
+  authMiddleware,
+  validateId,
+  asyncHandler((req, res) => orderController.cancel(req, res)),
+);
+
 export default orderRoutes;
