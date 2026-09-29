@@ -248,7 +248,7 @@ Por isso, o provisionamento de administradores é realizado por uma CLI executad
 ### Criar administrador
 
 ```bash
-yarn admin:create "admin@luxury.com" "Administrador Luxury" "SenhaForte"
+yarn admin:create "admin@luxury.com" "Administrador Luxury" "123456"
 ```
 
 O comando:
