@@ -9,6 +9,7 @@ const mockCreateProduct = jest.fn();
 const mockFindAllProducts = jest.fn();
 const mockFindProductById = jest.fn();
 const mockUpdateProduct = jest.fn();
+const mockDeleteProduct = jest.fn();
 
 jest.mock("../../services/ProductService", () => ({
   ProductService: jest.fn().mockImplementation(() => ({
@@ -16,7 +17,7 @@ jest.mock("../../services/ProductService", () => ({
     findById: (...args: unknown[]) => mockFindProductById(...args),
     create: (...args: unknown[]) => mockCreateProduct(...args),
     update: (...args: unknown[]) => mockUpdateProduct(...args),
-    delete: jest.fn(),
+    delete: (...args: unknown[]) => mockDeleteProduct(...args),
   })),
 }));
 
@@ -420,5 +421,126 @@ describe("ProductRoutes", () => {
     expect(response.body.errors).toBeDefined();
 
     expect(mockUpdateProduct).not.toHaveBeenCalled();
+  });
+
+  it("deve retornar erro quando o produto não for encontrado na atualização", async () => {
+    mockVerifyToken.mockResolvedValue({
+      userId: 1,
+      role: "ADMIN",
+    });
+
+    mockUpdateProduct.mockRejectedValue(
+      new AppError("Produto não encontrado", 404),
+    );
+
+    const updateData = {
+      name: "Anel de Ouro Atualizado",
+    };
+
+    const response = await request(app)
+      .patch("/products/999")
+      .set("Authorization", "Bearer token-admin")
+      .send(updateData);
+
+    expect(mockVerifyToken).toHaveBeenCalledWith("token-admin");
+
+    expect(mockUpdateProduct).toHaveBeenCalledWith(999, updateData);
+
+    expect(response.status).toBe(404);
+
+    expect(response.body).toEqual({
+      message: "Produto não encontrado",
+    });
+  });
+
+  it("deve permitir exclusão de produto para usuário ADMIN", async () => {
+    mockVerifyToken.mockResolvedValue({
+      userId: 1,
+      role: "ADMIN",
+    });
+
+    mockDeleteProduct.mockResolvedValue({
+      id: 1,
+      active: false,
+    });
+
+    const response = await request(app)
+      .delete("/products/1")
+      .set("Authorization", "Bearer token-admin");
+
+    expect(mockVerifyToken).toHaveBeenCalledWith("token-admin");
+
+    expect(mockDeleteProduct).toHaveBeenCalledWith(1);
+
+    expect(response.status).toBe(204);
+
+    expect(response.body).toEqual({});
+  });
+
+  it("deve bloquear exclusão de produto para usuário sem role ADMIN", async () => {
+    mockVerifyToken.mockResolvedValue({
+      userId: 2,
+      role: "USER",
+    });
+
+    const response = await request(app)
+      .delete("/products/1")
+      .set("Authorization", "Bearer token-user");
+
+    expect(mockVerifyToken).toHaveBeenCalledWith("token-user");
+
+    expect(response.status).toBe(403);
+
+    expect(response.body).toEqual({
+      message: "Acesso negado",
+    });
+
+    expect(mockDeleteProduct).not.toHaveBeenCalled();
+  });
+
+  it("deve retornar 400 ao excluir produto com ID inválido", async () => {
+    mockVerifyToken.mockResolvedValue({
+      userId: 1,
+      role: "ADMIN",
+    });
+
+    const response = await request(app)
+      .delete("/products/abc")
+      .set("Authorization", "Bearer token-admin");
+
+    expect(mockVerifyToken).toHaveBeenCalledWith("token-admin");
+
+    expect(response.status).toBe(400);
+
+    expect(response.body).toEqual({
+      message: "ID inválido",
+    });
+
+    expect(mockDeleteProduct).not.toHaveBeenCalled();
+  });
+
+  it("deve retornar 404 ao excluir produto não encontrado", async () => {
+    mockVerifyToken.mockResolvedValue({
+      userId: 1,
+      role: "ADMIN",
+    });
+
+    mockDeleteProduct.mockRejectedValue(
+      new AppError("Produto não encontrado", 404),
+    );
+
+    const response = await request(app)
+      .delete("/products/999")
+      .set("Authorization", "Bearer token-admin");
+
+    expect(mockVerifyToken).toHaveBeenCalledWith("token-admin");
+
+    expect(mockDeleteProduct).toHaveBeenCalledWith(999);
+
+    expect(response.status).toBe(404);
+
+    expect(response.body).toEqual({
+      message: "Produto não encontrado",
+    });
   });
 });

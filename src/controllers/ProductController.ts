@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { ProductService } from "../services/ProductService";
+import { AppError } from "../errors/AppError";
 
 export class ProductController {
   private productService: ProductService;
@@ -75,6 +76,12 @@ export class ProductController {
 
       return res.status(200).json(product);
     } catch (error) {
+      if (error instanceof AppError) {
+        return res.status(error.statusCode).json({
+          message: error.message,
+        });
+      }
+
       if (error instanceof Error) {
         return res.status(400).json({
           message: error.message,
