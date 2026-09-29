@@ -125,6 +125,35 @@ User
                 └── Category
 ```
 
+## 🌐 Aplicação em produção
+
+### Frontend
+
+[Vercel](https://luxury-store-web.vercel.app/)
+
+### API
+
+https://prisma-first-test.onrender.com
+
+---
+
+## 🔐 Credenciais para avaliação
+
+Para facilitar a avaliação das funcionalidades administrativas, foi disponibilizada uma conta de demonstração:
+
+**Administrador**
+
+- Email: `admin@luxury.com`
+- Senha: `123456`
+
+> Esta conta é destinada exclusivamente à demonstração e avaliação técnica do projeto.
+
+Com ela é possível testar as funcionalidades protegidas por autorização administrativa, como gerenciamento de produtos.
+
+### Usuário comum
+
+Também é possível criar uma nova conta diretamente pela aplicação através da página de cadastro. Contas criadas pelo cadastro público recebem permissões de usuário comum.
+
 ### Valores monetários
 
 Os valores monetários são armazenados como números inteiros representando centavos.
