@@ -136,3 +136,63 @@ describe("authMiddleware", () => {
     expect(res.json).not.toHaveBeenCalled();
   });
 });
+
+it("deve rejeitar quando o userId do token não for um número", async () => {
+  mockVerifyToken.mockResolvedValue({
+    userId: "1",
+    role: "USER",
+  });
+
+  const req = {
+    headers: {
+      authorization: "Bearer token-valido",
+    },
+  } as any;
+
+  const res = {
+    status: jest.fn().mockReturnThis(),
+    json: jest.fn().mockReturnThis(),
+  } as any;
+
+  const next = jest.fn();
+
+  await authMiddleware(req, res, next);
+
+  expect(res.status).toHaveBeenCalledWith(401);
+
+  expect(res.json).toHaveBeenCalledWith({
+    message: "Token inválido",
+  });
+
+  expect(next).not.toHaveBeenCalled();
+});
+
+it("deve rejeitar quando a role do token não for uma string", async () => {
+  mockVerifyToken.mockResolvedValue({
+    userId: 1,
+    role: 123,
+  });
+
+  const req = {
+    headers: {
+      authorization: "Bearer token-valido",
+    },
+  } as any;
+
+  const res = {
+    status: jest.fn().mockReturnThis(),
+    json: jest.fn().mockReturnThis(),
+  } as any;
+
+  const next = jest.fn();
+
+  await authMiddleware(req, res, next);
+
+  expect(res.status).toHaveBeenCalledWith(401);
+
+  expect(res.json).toHaveBeenCalledWith({
+    message: "Token inválido",
+  });
+
+  expect(next).not.toHaveBeenCalled();
+});

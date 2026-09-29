@@ -24,11 +24,17 @@ export class ProductService {
       throw new AppError("O limite deve estar entre 1 e 100", 400);
     }
 
-    if (filters?.minPrice !== undefined && filters.minPrice < 0) {
+    if (
+      filters?.minPrice !== undefined &&
+      (!Number.isFinite(filters.minPrice) || filters.minPrice < 0)
+    ) {
       throw new AppError("Preço mínimo inválido", 400);
     }
 
-    if (filters?.maxPrice !== undefined && filters.maxPrice < 0) {
+    if (
+      filters?.maxPrice !== undefined &&
+      (!Number.isFinite(filters.maxPrice) || filters.maxPrice < 0)
+    ) {
       throw new AppError("Preço máximo inválido", 400);
     }
 

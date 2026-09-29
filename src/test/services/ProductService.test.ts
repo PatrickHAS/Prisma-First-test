@@ -81,6 +81,65 @@ it("deve rejeitar limite maior que 100", async () => {
   );
 });
 
+it("deve rejeitar limite menor que 1", async () => {
+  const service = new ProductService();
+
+  await expect(service.findAll(1, 0)).rejects.toThrow(
+    "O limite deve estar entre 1 e 100",
+  );
+});
+
+it("deve rejeitar preço mínimo negativo", async () => {
+  const service = new ProductService();
+
+  await expect(
+    service.findAll(1, 10, {
+      minPrice: -1,
+    }),
+  ).rejects.toThrow("Preço mínimo inválido");
+});
+
+it("deve rejeitar preço máximo negativo", async () => {
+  const service = new ProductService();
+
+  await expect(
+    service.findAll(1, 10, {
+      maxPrice: -1,
+    }),
+  ).rejects.toThrow("Preço máximo inválido");
+});
+
+it("deve rejeitar preço mínimo maior que preço máximo", async () => {
+  const service = new ProductService();
+
+  await expect(
+    service.findAll(1, 10, {
+      minPrice: 20000,
+      maxPrice: 10000,
+    }),
+  ).rejects.toThrow("O preço mínimo não pode ser maior que o preço máximo");
+});
+
+it("deve rejeitar preço mínimo inválido quando for NaN", async () => {
+  const service = new ProductService();
+
+  await expect(
+    service.findAll(1, 10, {
+      minPrice: NaN,
+    }),
+  ).rejects.toThrow("Preço mínimo inválido");
+});
+
+it("deve rejeitar preço máximo inválido quando for NaN", async () => {
+  const service = new ProductService();
+
+  await expect(
+    service.findAll(1, 10, {
+      maxPrice: NaN,
+    }),
+  ).rejects.toThrow("Preço máximo inválido");
+});
+
 it("deve rejeitar produto sem nome", async () => {
   const service = new ProductService();
 
