@@ -41,6 +41,7 @@
     "contract:emit": "prisma contract emit",
     "dev": "tsx watch src/server.ts",
     "test": "jest",
-    "admin:create": "tsx src/scripts/createAdmin.ts"
+    "admin:create": "tsx src/scripts/createAdmin.ts",
+    "categories:seed": "tsx src/scripts/seedCategories.ts"
   }
 }
