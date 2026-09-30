@@ -484,8 +484,6 @@ POSTGRES_DB=luxury_store
 JWT_SECRET="defina-uma-chave-secreta-forte"
 ```
 
-> Nunca versione segredos reais ou arquivos `.env` de produção.
-
 ---
 
 ## Instalação
